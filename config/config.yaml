@@ -38,10 +38,13 @@ app:
 #   custom          → 完全自定义，详见 timeline.yaml
 #
 # 详细时间线图请查看 config/timeline.yaml
+#
+# 当前采用 custom：工作日 08:00-10:00 早间简报、19:00-21:00 晚间汇总，
+# 周末 10:00-12:00 早间简报、19:00-21:00 晚间汇总，其余时间只采集不推送。
 # ===============================================================
 schedule:
-  enabled: false                        # 是否启用调度系统（true=启用, false=关闭，默认关闭）
-  preset: "morning_evening"             # 预设模板名称（见上方说明）
+  enabled: true                         # 是否启用调度系统（true=启用, false=关闭，默认关闭）
+  preset: "custom"                      # 预设模板名称（见上方说明）
 
 
 # ===============================================================
@@ -127,26 +130,77 @@ rss:
   # - 正整数：覆盖全局设置，只推送此天数内的文章
   # - 0：禁用此频道的新鲜度过滤，推送所有文章
   feeds:
-    - id: "hacker-news"
-      name: "Hacker News"
-      url: "https://hnrss.org/frontpage"
+    # —— 国际政治 / 综合新闻 ——
+    - id: "bbc-world"
+      name: "BBC 国际"
+      url: "https://feeds.bbci.co.uk/news/world/rss.xml"
 
-    - id: "ruanyifeng"
-      name: "阮一峰的网络日志"
-      url: "http://www.ruanyifeng.com/blog/atom.xml"
-      enabled: false                  # 禁用
-      # max_age_days: 3               # 示例：推送 3 天内的文章（更新较慢的博客）
-     
+    - id: "aljazeera"
+      name: "半岛电视台"
+      url: "https://www.aljazeera.com/xml/rss/all.xml"
+
+    - id: "nyt-world"
+      name: "纽约时报 国际"
+      url: "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
+
+    - id: "politico"
+      name: "Politico 政治"
+      url: "https://rss.politico.com/politics-news.xml"
+
+    # —— 经济 / 商业 ——
+    - id: "bbc-business"
+      name: "BBC 商业"
+      url: "https://feeds.bbci.co.uk/news/business/rss.xml"
+
+    - id: "nyt-business"
+      name: "纽约时报 商业"
+      url: "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml"
+
+    - id: "ft-home"
+      name: "金融时报"
+      url: "https://www.ft.com/rss/home"
+
+    - id: "economist-finance"
+      name: "经济学人 财经"
+      url: "https://www.economist.com/finance-and-economics/rss.xml"
+
+    # —— 股市 / 市场 ——
+    - id: "cnbc-top"
+      name: "CNBC 头条"
+      url: "https://www.cnbc.com/id/100003114/device/rss/rss.html"
+
+    - id: "cnbc-markets"
+      name: "CNBC 市场"
+      url: "https://www.cnbc.com/id/20910258/device/rss/rss.html"
+
+    - id: "marketwatch"
+      name: "MarketWatch"
+      url: "https://feeds.content.dowjones.io/public/rss/mw_topstories"
+
     - id: "yahoo-finance"
       name: "雅虎财经"
       url: "https://finance.yahoo.com/news/rssindex"
 
-    # 自定义源示例
-    # - id: "custom-feed"
-    #   name: "自定义源"
-    #   url: "https://example.com/feed.xml"
-    #   enabled: false
-    #   max_age_days: 0               # 示例：禁用过滤，推送所有文章
+    # —— 科技 ——
+    - id: "bbc-tech"
+      name: "BBC 科技"
+      url: "https://feeds.bbci.co.uk/news/technology/rss.xml"
+
+    - id: "nyt-tech"
+      name: "纽约时报 科技"
+      url: "https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml"
+
+    - id: "techcrunch"
+      name: "TechCrunch"
+      url: "https://techcrunch.com/feed/"
+
+    - id: "arstechnica"
+      name: "Ars Technica"
+      url: "https://feeds.arstechnica.com/arstechnica/index"
+
+    - id: "hacker-news"
+      name: "Hacker News"
+      url: "https://hnrss.org/frontpage"
 
 
 # ===============================================================
@@ -175,7 +229,7 @@ report:
 # 4.5 筛选策略
 # ===============================================================
 filter:
-  method: "keyword"                     # 筛选方式（二选一）
+  method: "ai"                          # 筛选方式（二选一）
                                        # keyword = 关键词匹配，不调用 AI，不消耗 token，但规则固定
                                        #           词组定义在 config/frequency_words.txt
                                        # ai = AI 智能分类，更灵活但每次运行消耗 token
@@ -422,10 +476,10 @@ ai_analysis:
                                     # follow_report = 跟随 report.mode（默认）
                                     # daily / current / incremental = 强制使用指定模式
 
-  max_news_for_analysis: 150        # 参与分析的新闻数量上限（控制 token 成本的关键项）
+  max_news_for_analysis: 200        # 参与分析的新闻数量上限（控制 token 成本的关键项）
                                     # 热榜优先占用配额，RSS 用剩余配额，独立展示区不受此限制
 
-  include_rss: false                # 是否包含 RSS 内容进行分析（true=包含, false=不包含）
+  include_rss: true                 # 是否包含 RSS 内容进行分析（true=包含, false=不包含）
   include_standalone: true          # 是否纳入独立展示区数据（true=纳入, false=不纳入）
 
   include_rank_timeline: true       # 排名时间线详细程度
